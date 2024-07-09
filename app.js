@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const dotenv = require('dotenv').config();
 
 // additional requirements for authentication
 const session = require("express-session");
@@ -13,7 +14,7 @@ const bcrypt = require('bcryptjs');
 // setting up mongoDb connection and creating models
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const mongoDb = "mongodb://127.0.0.1:27017/topAuthenticationBasics";
+const mongoDb = process.env.DATABASE_URL;
 mongoose.connect(mongoDb);
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "mongo connection error"));
