@@ -17,14 +17,6 @@ mongoose.connect(mongoDb);
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "mongo connection error"));
 
-// const User = mongoose.model(
-//   "User",
-//   new Schema({
-//     username: { type: String, required: true },
-//     password: { type: String, required: true }
-//   })
-// );
-
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
@@ -46,6 +38,42 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+
+// authentication set up using passportJS
+// const User = require("../models/user");
+
+// passport.use(
+//   new LocalStrategy(async (username, password, done) => {
+//     try {
+//       const user = await User.findOne({ username: username });
+//       if (!user) {
+//         return done(null, false, { message: "Incorrect username" });
+//       };
+//       if (user.password !== password) {
+//         return done(null, false, { message: "Incorrect password" });
+//       };
+//       return done(null, user);
+//     } catch(err) {
+//       return done(err);
+//     };
+//   })
+// );
+
+// passport.serializeUser((user, done) => {
+//   done(null, user.id);
+// });
+
+// passport.deserializeUser(async (id, done) => {
+//   try {
+//     const user = await User.findById(id);
+//     done(null, user);
+//   } catch(err) {
+//     done(err);
+//   };
+// });
+
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
