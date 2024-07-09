@@ -4,6 +4,27 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+// additional requirements for authentication
+const session = require("express-session");
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+
+// setting up mongoDb connection and creating models
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+const mongoDb = "mongodb://127.0.0.1:27017/topAuthenticationBasics";
+mongoose.connect(mongoDb);
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "mongo connection error"));
+
+// const User = mongoose.model(
+//   "User",
+//   new Schema({
+//     username: { type: String, required: true },
+//     password: { type: String, required: true }
+//   })
+// );
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
@@ -12,6 +33,10 @@ var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
+app.use(passport.session());
+app.use(express.urlencoded({ extended: false }));
 
 app.use(logger('dev'));
 app.use(express.json());
