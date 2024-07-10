@@ -63,19 +63,24 @@ app.post('/api/posts', verifyToken, (req,res) =>{
   })
 })
 
-app.post('/api/login', (req,res) => {
-  // mock user
-  const user = {
-    id: 1,
-    username: 'brad',
-    email: 'brad@gmail.com'
-  }
-  jwt.sign({user: user}, 'secretkey', (err, token) => {
-    res.json({
-      token: token
-    })
-  });
-})
+app.post('/api/login', (req, res, next) => {
+  passport.authenticate('local', { session: false }, (err, user, info) => {
+    if (err || !user) {
+      return res.status(400).json({
+        message: 'Something is not right',
+        user: user
+      });
+    }
+    req.login(user, { session: false }, (err) => {
+      if (err) {
+        res.send(err);
+      }
+      // generate a signed son web token with the contents of user object and return it in the response
+      const token = jwt.sign({ id: user._id, username: user.username }, 'secretkey', { expiresIn: '1h' });
+      return res.json({ token });
+    });
+  })(req, res);
+});
 
 //verify token
 function verifyToken(req, res, next) {
