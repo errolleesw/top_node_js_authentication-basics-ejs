@@ -15,7 +15,7 @@ router.get('/sign-up', function(req, res, next) {
 
 router.post("/sign-up", async (req, res, next) => {
   try {
-    // Has the password
+    // Hash the password
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
     // Create a new user with the hashed password
@@ -46,4 +46,5 @@ router.post(
     failureRedirect: "/"
   })
 );
+
 module.exports = router;
