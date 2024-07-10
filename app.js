@@ -4,6 +4,8 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const dotenv = require('dotenv').config();
+const jwt = require('jsonwebtoken');
+
 
 // additional requirements for authentication
 const session = require("express-session");
@@ -42,14 +44,65 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
+app.get('/api', (req, res) => {
+  res.json({
+    message: 'Welcome to the API'
+  });
+});
+
+app.post('/api/posts', verifyToken, (req,res) =>{
+  jwt.verify(req.token, 'secretkey', (err, authData) => {
+    if (err) {
+      res.sendStatus(403);
+    } else {
+      res.json({
+        message: 'Post created...',
+        authData,
+      })
+    }
+  })
+})
+
+app.post('/api/login', (req,res) => {
+  // mock user
+  const user = {
+    id: 1,
+    username: 'brad',
+    email: 'brad@gmail.com'
+  }
+  jwt.sign({user: user}, 'secretkey', (err, token) => {
+    res.json({
+      token: token
+    })
+  });
+})
+
+//verify token
+function verifyToken(req, res, next) {
+  // Get auth header value
+  const bearerHeader = req.headers['authorization'];
+  // check if bearer is undefined
+  if (typeof bearerHeader !== 'undefined') {
+    // split at the space format of token is "Authorization: Bearer <access_token>"
+    const bearer = bearerHeader.split(' ');
+    // get token from array
+    const bearerToken = bearer[1];
+    // set the token
+    req.token = bearerToken;
+    next();
+  } else {
+    // Forbindden
+    res.sendStatus(403);
+  }
+}
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
